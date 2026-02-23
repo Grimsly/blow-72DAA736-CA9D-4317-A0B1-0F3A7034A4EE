@@ -1,34 +1,91 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { Role } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/data';
+
+export interface User {
+  id: string;
+  email: string;
+  role: Role;
+  organizationId: string;
+}
+
+export interface LoginResponse {
+  access_token: string;
+  user: User;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  role: Role;
+  organizationId: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
-  private currentUserSubject = new BehaviorSubject<any>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private router = inject(Router);
+
+  // Use signals for reactive state
+  currentUser = signal<User | null>(null);
+  isAuthenticated = signal<boolean>(false);
 
   constructor() {
-    const token = localStorage.getItem('access_token');
+    this.loadUser();
+  }
+
+  private loadUser(): void {
+    const token = this.getToken();
     if (token) {
-      // Decode JWT to get user info
-      this.currentUserSubject.next(this.decodeToken(token));
+      try {
+        const payload = this.decodeToken(token);
+        this.currentUser.set({
+          id: payload.sub,
+          email: payload.email,
+          role: payload.role,
+          organizationId: payload.organizationId,
+        });
+        this.isAuthenticated.set(true);
+      } catch {
+        this.logout();
+      }
     }
   }
 
-  login(email: string, password: string): Observable<any> {
-    return this.http.post<any>('/api/auth/login', { email, password }).pipe(
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>('/api/auth/login', credentials).pipe(
       tap((response) => {
         localStorage.setItem('access_token', response.access_token);
-        this.currentUserSubject.next(response.user);
+        this.currentUser.set(response.user);
+        this.isAuthenticated.set(true);
+        this.router.navigate(['/tasks']);
       })
     );
   }
 
-  logout() {
+  register(data: RegisterRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>('/api/auth/register', data).pipe(
+      tap((response) => {
+        localStorage.setItem('access_token', response.access_token);
+        this.currentUser.set(response.user);
+        this.isAuthenticated.set(true);
+        this.router.navigate(['/tasks']);
+      })
+    );
+  }
+
+  logout(): void {
     localStorage.removeItem('access_token');
-    this.currentUserSubject.next(null);
+    this.currentUser.set(null);
+    this.isAuthenticated.set(false);
+    this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
