@@ -9,7 +9,8 @@
     "emitDecoratorMetadata": true,
     "target": "es2021",
     "composite": true,
-    "declaration": true
+    "declaration": true,
+    "strictPropertyInitialization": false
   },
   "include": ["src/**/*.ts"],
   "exclude": [
@@ -22,5 +23,10 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"
+  ],
+  "references": [
+    {
+      "path": "../../libs/data/tsconfig.lib.json"
+    }
   ]
 }
