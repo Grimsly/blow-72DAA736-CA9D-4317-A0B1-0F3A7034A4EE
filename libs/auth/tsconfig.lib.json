@@ -8,10 +8,19 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"],
     "composite": true,
-    "declaration": true
+    "declaration": true,
+    "paths": {
+      "@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/data": [
+        "../../libs/data/src/index.ts"
+      ]
+    }
   },
   "include": ["src/**/*.ts"],
-  "references": [],
+  "references": [
+    {
+      "path": "../data/tsconfig.lib.json"
+    }
+  ],
   "exclude": [
     "jest.config.ts",
     "jest.config.cts",
