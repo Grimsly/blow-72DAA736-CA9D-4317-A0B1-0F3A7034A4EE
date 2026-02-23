@@ -8,13 +8,17 @@
     "lib": ["ES2022", "dom"],
     "esModuleInterop": true,
     "isolatedModules": true,
-    "emitDecoratorMetadata": false
+    "emitDecoratorMetadata": false,
+    "composite": true,
+    "declaration": true,
+    "moduleResolution": "bundler"
   },
   "files": ["src/test-setup.ts"],
   "include": [
     "jest.config.cts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
+    "src/**/*.ts",
     "src/**/*.d.ts"
   ]
 }
