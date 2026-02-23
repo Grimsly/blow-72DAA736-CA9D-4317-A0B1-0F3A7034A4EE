@@ -1,3 +1,4 @@
+import { Role } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/data';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -5,7 +6,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 export interface JwtPayload {
   sub: string; // user id
   email: string;
-  role: string;
+  role: Role;
   organizationId: string;
 }
 
