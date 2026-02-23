@@ -8,27 +8,12 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import {
-  JwtAuthGuard,
-  CurrentUser,
-  JwtPayload,
-} from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/auth';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/current-user.decorator';
 import { TasksService } from './tasks.service';
-import { TaskStatus } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/data';
-
-export interface CreateTaskDto {
-  title: string;
-  description: string;
-  status?: TaskStatus;
-  category?: string;
-}
-
-export interface UpdateTaskDto {
-  title?: string;
-  description?: string;
-  status?: TaskStatus;
-  category?: string;
-}
+import { CreateTaskDto, UpdateTaskDto } from './dtos';
+import { Task } from '../entities/task.entity';
+import { AuthenticatedUser } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/auth';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
@@ -38,19 +23,19 @@ export class TasksController {
   @Post()
   create(
     @Body() createTaskDto: CreateTaskDto,
-    @CurrentUser() user: JwtPayload
-  ) {
+    @CurrentUser() user: AuthenticatedUser
+  ): Promise<Task> {
     return this.tasksService.createTask(
       createTaskDto,
-      user.sub,
+      user.userId,
       user.organizationId
     );
   }
 
   @Get()
-  findAll(@CurrentUser() user: JwtPayload) {
+  findAll(@CurrentUser() user: AuthenticatedUser): Promise<Task[]> {
     return this.tasksService.findAllAccessible(
-      user.sub,
+      user.userId,
       user.role,
       user.organizationId
     );
@@ -60,24 +45,28 @@ export class TasksController {
   update(
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
-    @CurrentUser() user: JwtPayload
-  ) {
+    @CurrentUser() user: AuthenticatedUser
+  ): Promise<Task> {
     return this.tasksService.updateTask(
       id,
       updateTaskDto,
-      user.sub,
+      user.userId,
       user.role,
       user.organizationId
     );
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.tasksService.deleteTask(
+  async delete(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser
+  ): Promise<{ message: string }> {
+    await this.tasksService.deleteTask(
       id,
-      user.sub,
+      user.userId,
       user.role,
       user.organizationId
     );
+    return { message: 'Task deleted successfully' };
   }
 }

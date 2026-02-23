@@ -4,11 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Task } from '../entities/task.entity';
 import { Organization } from '../entities/organization.entity';
 import { Role } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/data';
-import { CreateTaskDto, UpdateTaskDto } from './tasks.controller';
+import { CreateTaskDto, UpdateTaskDto } from './dtos';
 
 @Injectable()
 export class TasksService {
@@ -60,7 +60,7 @@ export class TasksService {
     createTaskDto: CreateTaskDto,
     userId: string,
     userOrgId: string
-  ) {
+  ): Promise<Task> {
     const task = this.tasksRepository.create({
       ...createTaskDto,
       createdById: userId,
@@ -69,24 +69,31 @@ export class TasksService {
     return this.tasksRepository.save(task);
   }
 
-  async findAllAccessible(userId: string, userRole: Role, userOrgId: string) {
-    // Implementation depends on role
+  async findAllAccessible(
+    userId: string,
+    userRole: Role,
+    userOrgId: string
+  ): Promise<Task[]> {
     if (userRole === Role.OWNER) {
-      // Get all orgs in hierarchy
       const orgIds = await this.getOrgHierarchyIds(userOrgId);
       return this.tasksRepository.find({
-        where: orgIds.map((id) => ({ organizationId: id })),
+        where: { organizationId: In(orgIds) },
+        order: { createdAt: 'DESC' },
       });
     }
 
     if (userRole === Role.ADMIN) {
       return this.tasksRepository.find({
         where: { organizationId: userOrgId },
+        order: { createdAt: 'DESC' },
       });
     }
 
     // Viewer only sees their own
-    return this.tasksRepository.find({ where: { createdById: userId } });
+    return this.tasksRepository.find({
+      where: { createdById: userId },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async getOrgHierarchyIds(orgId: string): Promise<string[]> {
@@ -106,7 +113,7 @@ export class TasksService {
     userId: string,
     userRole: Role,
     userOrgId: string
-  ) {
+  ): Promise<Task> {
     if (userRole === Role.VIEWER) {
       throw new ForbiddenException('Viewers cannot edit tasks');
     }
@@ -116,7 +123,9 @@ export class TasksService {
     }
 
     await this.tasksRepository.update(id, updateTaskDto);
-    return this.tasksRepository.findOne({ where: { id } });
+    const task = await this.tasksRepository.findOne({ where: { id } });
+    if (!task) throw new NotFoundException('Task not found');
+    return task;
   }
 
   async deleteTask(
@@ -124,7 +133,7 @@ export class TasksService {
     userId: string,
     userRole: Role,
     userOrgId: string
-  ) {
+  ): Promise<void> {
     if (userRole === Role.VIEWER) {
       throw new ForbiddenException('Viewers cannot delete tasks');
     }

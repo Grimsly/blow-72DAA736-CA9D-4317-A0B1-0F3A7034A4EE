@@ -10,6 +10,13 @@ export interface JwtPayload {
   organizationId: string;
 }
 
+export interface AuthenticatedUser {
+  userId: string;
+  email: string;
+  role: Role;
+  organizationId: string;
+}
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
@@ -20,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload): Promise<AuthenticatedUser> {
     return {
       userId: payload.sub,
       email: payload.email,

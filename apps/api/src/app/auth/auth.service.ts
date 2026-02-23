@@ -1,10 +1,24 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
 import { Role } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/data';
+
+export interface LoginResponse {
+  access_token: string;
+  user: {
+    id: string;
+    email: string;
+    role: Role;
+    organizationId: string;
+  };
+}
 
 @Injectable()
 export class AuthService {
@@ -19,7 +33,15 @@ export class AuthService {
     password: string,
     role: Role,
     organizationId: string
-  ) {
+  ): Promise<LoginResponse> {
+    // Check if user exists
+    const existingUser = await this.usersRepository.findOne({
+      where: { email },
+    });
+    if (existingUser) {
+      throw new ConflictException('User already exists');
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = this.usersRepository.create({
       email,
@@ -39,7 +61,7 @@ export class AuthService {
     throw new UnauthorizedException('Invalid credentials');
   }
 
-  async login(user: User) {
+  async login(user: User): Promise<LoginResponse> {
     const payload = {
       sub: user.id,
       email: user.email,
