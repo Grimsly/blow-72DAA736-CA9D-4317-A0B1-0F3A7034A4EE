@@ -1,10 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./out-tsc/jest",
+    "outDir": "../../dist/out-tsc",
+    "module": "commonjs",
     "types": ["jest", "node"],
+    "tsBuildInfoFile": "../../dist/out-tsc/apps/api/tsconfig.spec.tsbuildinfo",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "composite": true,
+    "declaration": true
   },
   "include": [
     "jest.config.ts",

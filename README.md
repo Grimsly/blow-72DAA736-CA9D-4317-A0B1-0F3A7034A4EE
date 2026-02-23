@@ -22,3 +22,7 @@ If `nx` has not yet been installed, then run the following command:
 ```bash
 npm install -g nx
 ```
+
+## Known Issues
+
+- Dashboard tests display a TypeScript error `Cannot find module '@angular/core/testing'` during execution, but tests run successfully. This is a known module resolution issue between Angular 21, NX 22, and jest-preset-angular v16 (see [NX issue #33777](https://github.com/nrwl/nx/issues/33777)). The error is cosmetic - all test functionality works correctly and assertions pass.
