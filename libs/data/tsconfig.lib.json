@@ -2,6 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "module": "node16",
+    "moduleResolution": "node16",
     "outDir": "../../dist/out-tsc",
     "tsBuildInfoFile": "../../dist/out-tsc/libs/data/tsconfig.lib.tsbuildinfo",
     "emitDeclarationOnly": false,

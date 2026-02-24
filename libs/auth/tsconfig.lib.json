@@ -3,6 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "../../dist/out-tsc",
+    "module": "node16",
+    "moduleResolution": "node16",
     "tsBuildInfoFile": "../../dist/out-tsc/libs/auth/tsconfig.lib.tsbuildinfo",
     "emitDeclarationOnly": false,
     "forceConsistentCasingInFileNames": true,

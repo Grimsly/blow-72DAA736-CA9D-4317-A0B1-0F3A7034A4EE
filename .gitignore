@@ -46,3 +46,7 @@ Thumbs.db
 test-output
 
 .angular
+
+data.db
+data.db-journal
+.env

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "types": ["node"],
-    "module": "commonjs",
+    "moduleResolution": "node16",
+    "module": "node16",
     "tsBuildInfoFile": "../../dist/out-tsc/apps/api/tsconfig.app.tsbuildinfo",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

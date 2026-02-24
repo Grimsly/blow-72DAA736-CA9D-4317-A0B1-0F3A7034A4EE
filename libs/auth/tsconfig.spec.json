@@ -3,6 +3,8 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "types": ["jest", "node"],
+    "module": "node16",
+    "moduleResolution": "node16",
     "forceConsistentCasingInFileNames": true,
     "composite": true,
     "declaration": true
