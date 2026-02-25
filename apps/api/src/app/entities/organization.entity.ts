@@ -9,7 +9,7 @@ export class Organization {
   name: string;
 
   @Column({ nullable: true })
-  parentId: string;
+  parentId: string | null;
 
   @ManyToOne(() => Organization, { nullable: true })
   parent: Organization;

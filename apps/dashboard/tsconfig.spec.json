@@ -13,12 +13,20 @@
     "declaration": true,
     "moduleResolution": "bundler"
   },
-  "files": ["src/test-setup.ts"],
+  "files": [],
   "include": [
-    "jest.config.cts",
+    "jest.config.mjs",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
     "src/**/*.ts",
     "src/**/*.d.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "../../libs/data/tsconfig.lib.json"
+    }
   ]
 }

@@ -178,7 +178,12 @@ export class TasksComponent implements OnInit {
     // Delete key to delete selected task
     if (event.key === 'Delete' && this.selectedTaskId()) {
       event.preventDefault();
-      this.openDeleteModal(this.selectedTaskId()!);
+
+      const selected_task_id = this.selectedTaskId();
+
+      if (selected_task_id) {
+        this.openDeleteModal(selected_task_id);
+      }
     }
 
     // Escape to close modals or deselect
@@ -216,7 +221,7 @@ export class TasksComponent implements OnInit {
   // Sorting (one-time action)
   sortTasksBy(option: SortOption): void {
     const tasks = this.taskService.tasks();
-    let sorted = [...tasks];
+    const sorted = [...tasks];
 
     switch (option) {
       case 'date':
@@ -234,7 +239,6 @@ export class TasksComponent implements OnInit {
     this.updateLocalArrays();
   }
 
-  // Drag and drop - FIXED VERSION
   drop(event: CdkDragDrop<ITask[]>): void {
     if (!this.canEditTask()) return;
 
@@ -381,17 +385,17 @@ export class TasksComponent implements OnInit {
   }
 
   saveTask(): void {
-    if (!this.editingTaskId()) return;
+    const editing_task_id = this.editingTaskId();
 
-    this.taskService
-      .updateTask(this.editingTaskId()!, this.editTask)
-      .subscribe({
-        next: () => {
-          this.closeEditModal();
-          this.updateLocalArrays();
-        },
-        error: (err) => alert('Failed to update task: ' + err.message),
-      });
+    if (!editing_task_id) return;
+
+    this.taskService.updateTask(editing_task_id, this.editTask).subscribe({
+      next: () => {
+        this.closeEditModal();
+        this.updateLocalArrays();
+      },
+      error: (err) => alert('Failed to update task: ' + err.message),
+    });
   }
 
   formatDate(date: Date | string): string {
@@ -403,31 +407,5 @@ export class TasksComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     });
-  }
-
-  getStatusLabel(status: TaskStatus): string {
-    switch (status) {
-      case TaskStatus.TODO:
-        return 'To Do';
-      case TaskStatus.IN_PROGRESS:
-        return 'In Progress';
-      case TaskStatus.DONE:
-        return 'Done';
-      default:
-        return status;
-    }
-  }
-
-  getStatusColor(status: TaskStatus): string {
-    switch (status) {
-      case TaskStatus.TODO:
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case TaskStatus.IN_PROGRESS:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case TaskStatus.DONE:
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
   }
 }

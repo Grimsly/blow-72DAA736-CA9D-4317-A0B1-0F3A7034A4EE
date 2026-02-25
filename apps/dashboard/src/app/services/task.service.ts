@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { catchError, Observable, tap } from 'rxjs';
 import {
   ITask,
   TaskStatus,
@@ -35,6 +35,10 @@ export class TaskService {
       tap((tasks) => {
         this.tasks.set(tasks);
         this.loading.set(false);
+      }),
+      catchError((error) => {
+        this.loading.set(false);
+        throw error;
       })
     );
   }
