@@ -13,10 +13,11 @@ import { TasksModule } from './tasks/tasks.module';
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
+      // Preferably I would like to use Postgres, but SQLite is faster to bootstrap
       type: 'sqlite',
       database: process.env.DATABASE_PATH || 'data.db',
       entities: [User, Organization, Task],
-      synchronize: true, // Only for development!
+      synchronize: true,
       logging: false,
     }),
     AuthModule,

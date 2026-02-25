@@ -14,7 +14,6 @@ import {
   CdkDropList,
   CdkDragDrop,
   moveItemInArray,
-  transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { TaskService } from '../../services/task.service';
 import { AuthService } from '../../services/auth.service';
@@ -62,7 +61,7 @@ export class TasksComponent implements OnInit {
   showEditModal = signal(false);
   showDeleteModal = signal(false);
 
-  // New task form
+  // New initial task form
   newTask = {
     title: '',
     description: '',
@@ -181,7 +180,7 @@ export class TasksComponent implements OnInit {
 
       const selected_task_id = this.selectedTaskId();
 
-      if (selected_task_id) {
+      if (selected_task_id && this.canEditTask()) {
         this.openDeleteModal(selected_task_id);
       }
     }
@@ -255,27 +254,23 @@ export class TasksComponent implements OnInit {
       const task = event.previousContainer.data[event.previousIndex];
       const newStatus = this.getStatusFromContainer(event.container.data);
 
-      // Transfer in local arrays
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
+      if (!newStatus) return;
+
+      const updatedTask = { ...task, status: newStatus };
+
+      event.previousContainer.data.splice(event.previousIndex, 1);
+      event.container.data.splice(event.currentIndex, 0, updatedTask);
+
+      this.syncToService();
 
       // Update in backend
-      if (newStatus) {
-        this.taskService.updateTask(task.id, { status: newStatus }).subscribe({
-          next: () => {
-            this.syncToService();
-          },
-          error: (err) => {
-            alert('Failed to update task: ' + err.message);
-            // Revert on error
-            this.updateLocalArrays();
-          },
-        });
-      }
+      this.taskService.updateTask(task.id, { status: newStatus }).subscribe({
+        error: (err) => {
+          alert('Failed to update task: ' + err.message);
+          // Revert on error
+          this.updateLocalArrays();
+        },
+      });
     }
   }
 
