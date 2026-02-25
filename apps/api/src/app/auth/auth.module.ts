@@ -15,7 +15,9 @@ import { JwtStrategy } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/auth';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
+        // NOTE: Only for test purposes, not for actual production use
+        // Real case, the server should not run if a proper secret is not set
+        secret: configService.get('JWT_SECRET') || 'secret-key',
         signOptions: { expiresIn: '24h' },
       }),
       inject: [ConfigService],

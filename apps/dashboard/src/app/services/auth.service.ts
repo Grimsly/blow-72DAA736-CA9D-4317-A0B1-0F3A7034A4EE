@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { Role } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/data';
+import { JwtPayload } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/auth';
 
 export interface User {
   id: string;
@@ -46,13 +47,17 @@ export class AuthService {
     if (token) {
       try {
         const payload = this.decodeToken(token);
-        this.currentUser.set({
-          id: payload.sub,
-          email: payload.email,
-          role: payload.role,
-          organizationId: payload.organizationId,
-        });
-        this.isAuthenticated.set(true);
+        if (payload) {
+          this.currentUser.set({
+            id: payload.sub,
+            email: payload.email,
+            role: payload.role,
+            organizationId: payload.organizationId,
+          });
+          this.isAuthenticated.set(true);
+        } else {
+          throw new Error("Payload can't be decoded");
+        }
       } catch {
         this.logout();
       }
@@ -92,7 +97,7 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
 
-  private decodeToken(token: string): any {
+  private decodeToken(token: string): JwtPayload | null {
     try {
       return JSON.parse(atob(token.split('.')[1]));
     } catch {
