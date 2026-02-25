@@ -76,7 +76,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{projectRoot}/test-output/jest/coverage"],
       "options": {
-        "jestConfig": "apps/dashboard/jest.config.cts",
+        "jestConfig": "apps/dashboard/jest.config.mjs",
         "tsConfig": "apps/dashboard/tsconfig.spec.json"
       }
     },
