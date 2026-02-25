@@ -46,7 +46,7 @@ async function seed() {
   const hashedPassword = await bcrypt.hash('password123', 10);
 
   const owner = userRepo.create({
-    email: 'owner@acme.com',
+    email: 'owner@turbovets.com',
     password: hashedPassword,
     role: Role.OWNER,
     organizationId: parentOrg.id,
@@ -54,7 +54,7 @@ async function seed() {
   await userRepo.save(owner);
 
   const admin = userRepo.create({
-    email: 'admin@acme.com',
+    email: 'admin@turbovets.com',
     password: hashedPassword,
     role: Role.ADMIN,
     organizationId: childOrg.id,
@@ -62,7 +62,7 @@ async function seed() {
   await userRepo.save(admin);
 
   const viewer = userRepo.create({
-    email: 'viewer@acme.com',
+    email: 'viewer@turbovets.com',
     password: hashedPassword,
     role: Role.VIEWER,
     organizationId: childOrg.id,
@@ -113,9 +113,9 @@ async function seed() {
 
   console.log('\n✅ Seed data created successfully!\n');
   console.log('📧 Test Credentials:');
-  console.log('Owner:  owner@acme.com  / password123');
-  console.log('Admin:  admin@acme.com  / password123');
-  console.log('Viewer: viewer@acme.com / password123\n');
+  console.log('Owner:  owner@turbovets.com  / password123');
+  console.log('Admin:  admin@turbovets.com  / password123');
+  console.log('Viewer: viewer@turbovets.com / password123\n');
   console.log('🏢 Organizations:');
   console.log(`Parent: ${parentOrg.name} (${parentOrg.id})`);
   console.log(`Child:  ${childOrg.name} (${childOrg.id})\n`);

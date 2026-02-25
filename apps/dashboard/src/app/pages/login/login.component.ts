@@ -64,9 +64,9 @@ import { AuthService } from '../../services/auth.service';
 
         <div class="text-sm text-center text-gray-600">
           <p>Test credentials:</p>
-          <p>Owner: owner@acme.com / password123</p>
-          <p>Admin: admin@acme.com / password123</p>
-          <p>Viewer: viewer@acme.com / password123</p>
+          <p>Owner: owner@turbovets.com / password123</p>
+          <p>Admin: admin@turbovets.com / password123</p>
+          <p>Viewer: viewer@turbovets.com / password123</p>
         </div>
       </div>
     </div>

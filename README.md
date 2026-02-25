@@ -10,10 +10,10 @@
   - [Access the Application](#access-the-application)
   - [Test Credentials](#test-credentials)
 - [Project Structure](#project-structure)
-- [🗄️ Database Setup](#️-database-setup)
+- [Database Setup](#database-setup)
   - [SQLite Configuration](#sqlite-configuration)
   - [Seeding the Database](#seeding-the-database)
-- [🏗️ Architecture](#️-architecture)
+- [Architecture](#architecture)
   - [Technology Stack](#technology-stack)
   - [Design Decisions](#design-decisions)
 - [Data Model](#data-model)
@@ -25,7 +25,7 @@
     - [Permission Matrix](#permission-matrix)
   - [JWT Authentication Flow](#jwt-authentication-flow)
   - [Organization Hierarchy Access](#organization-hierarchy-access)
-- [📡 API Documentation](#-api-documentation)
+- [API Documentation](#api-documentation)
   - [Base URL](#base-url)
   - [Authentication](#authentication)
     - [POST /auth/login](#post-authlogin)
@@ -44,7 +44,6 @@
   - [Production-Ready Security](#production-ready-security)
   - [Advanced Features](#advanced-features)
 - [Known Issues](#known-issues)
-
 
 ## Prerequisites
 
@@ -67,37 +66,38 @@ If `nx` has not yet been installed, then run the following command:
 npm install -g nx
 ```
 
-> Secure Task Management System with Role-Based Access Control (RBAC)
-
 ## Quick Start
 
 ### Installation
 
 1. Install dependencies.
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 2. Set up environment variables. Only change the `JWT_SECRET` field with your secret key.
-    ```bash
-    cp .env.example .env
-    ```
+
+   ```bash
+   cp .env.example .env
+   ```
 
 3. Seed the database with test data.
-    ```bash
-    npm run seed
-    ```
+
+   ```bash
+   npm run seed
+   ```
 
 4. Start the backend with:
-    ```bash
-    npx nx serve api
-    ```
+
+   ```bash
+   npx nx serve api
+   ```
 
 5. In a new terminal at the same directory, start the frontend with:
-    ```bash
-    npx nx serve dashboard
-    ```
+   ```bash
+   npx nx serve dashboard
+   ```
 
 ### Access the Application
 
@@ -106,11 +106,11 @@ npm install -g nx
 
 ### Test Credentials
 
-| Role   | Email              | Password    |
-|--------|--------------------|-------------|
-| Owner  | owner@acme.com     | password123 |
-| Admin  | admin@acme.com     | password123 |
-| Viewer | viewer@acme.com    | password123 |
+| Role   | Email                | Password    |
+| ------ | -------------------- | ----------- |
+| Owner  | owner@turbovets.com  | password123 |
+| Admin  | admin@turbovets.com  | password123 |
+| Viewer | viewer@turbovets.com | password123 |
 
 ---
 
@@ -123,7 +123,7 @@ task-management/
 │   │   ├── src/
 │   │   │   ├── app/
 │   │   │   │   ├── auth/         # Authentication module
-│   │   │   │   ├── tasks/        # Tasks module  
+│   │   │   │   ├── tasks/        # Tasks module
 │   │   │   │   └── entities/     # TypeORM entities
 │   │   │   ├── seed.ts           # Database seeding
 │   │   │   └── main.ts
@@ -152,7 +152,7 @@ task-management/
 
 ---
 
-## 🗄️ Database Setup
+## Database Setup
 
 ### SQLite Configuration
 
@@ -165,6 +165,7 @@ The application uses SQLite for ease of development and assessment. The database
 ### Seeding the Database
 
 The seed script populates the database with:
+
 - 2 organizations (parent-child hierarchy)
 - 3 users (Owner, Admin, Viewer)
 - 4 sample tasks
@@ -174,19 +175,21 @@ npm run seed
 ```
 
 **What gets created:**
-- **Organizations**: 
+
+- **Organizations**:
   - Acme Corporation (parent)
   - Acme Engineering (child)
-- **Users**: owner@acme.com, admin@acme.com, viewer@acme.com
+- **Users**: owner@turbovets.com, admin@turbovets.com, viewer@turbovets.com
 - **Tasks**: Sample tasks across different statuses and categories
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Technology Stack
 
 **Backend:**
+
 - NestJS - TypeScript framework
 - TypeORM - ORM with SQLite
 - Passport JWT - Authentication
@@ -194,12 +197,14 @@ npm run seed
 - class-validator - DTO validation
 
 **Frontend:**
+
 - Angular 21 - Modern component-based framework
 - Signals - Reactive state management
 - Tailwind CSS - Utility-first styling
 - inject() API - Modern dependency injection
 
 **Shared:**
+
 - NX - Monorepo tooling
 - TypeScript - Type safety across stack
 
@@ -232,6 +237,7 @@ Organization (1) ──< (N) Organization (self-reference: parent-child)
 ### Entities
 
 **User**
+
 - `id`: UUID primary key
 - `email`: Unique email address
 - `password`: Bcrypt hashed (10 rounds)
@@ -239,11 +245,13 @@ Organization (1) ──< (N) Organization (self-reference: parent-child)
 - `organizationId`: Foreign key to Organization
 
 **Organization**
+
 - `id`: UUID primary key
 - `name`: Organization name
 - `parentId`: Self-referencing FK (nullable)
 
 **Task**
+
 - `id`: UUID primary key
 - `title`: Task title
 - `description`: Detailed description
@@ -281,13 +289,13 @@ VIEWER (Lowest Privilege)
 
 #### Permission Matrix
 
-| Action          | Owner | Admin | Viewer |
-|-----------------|-------|-------|--------|
-| Create Task     | ✅    | ✅    | ✅     |
-| View All Tasks  | ✅ *  | ✅ ** | ❌     |
-| View Own Tasks  | ✅    | ✅    | ✅     |
-| Edit Any Task   | ✅ *  | ✅ ** | ❌     |
-| Delete Any Task | ✅ *  | ✅ ** | ❌     |
+| Action          | Owner | Admin   | Viewer |
+| --------------- | ----- | ------- | ------ |
+| Create Task     | ✅    | ✅      | ✅     |
+| View All Tasks  | ✅ \* | ✅ \*\* | ❌     |
+| View Own Tasks  | ✅    | ✅      | ✅     |
+| Edit Any Task   | ✅ \* | ✅ \*\* | ❌     |
+| Delete Any Task | ✅ \* | ✅ \*\* | ❌     |
 
 \* Owner sees/edits tasks in org hierarchy  
 \*\* Admin sees/edits tasks in same org only
@@ -327,7 +335,7 @@ The system implements cascading access control:
 // Owner in parent org can access child org tasks
 isInOrgHierarchy(childOrgId, parentOrgId) {
   if (childOrgId === parentOrgId) return true;
-  
+
   org = findOrganization(childOrgId);
   if (org.parentId) {
     return isInOrgHierarchy(org.parentId, parentOrgId);
@@ -337,36 +345,41 @@ isInOrgHierarchy(childOrgId, parentOrgId) {
 ```
 
 **Example:**
+
 - Owner in "Acme Corporation" can access tasks in "Acme Engineering"
 - Admin in "Acme Engineering" cannot access tasks in "Acme Corporation"
 
 ---
 
-## 📡 API Documentation
+## API Documentation
 
 ### Base URL
+
 `http://localhost:3000/api`
 
 ### Authentication
 
 #### POST /auth/login
+
 Authenticate user and receive JWT token
 
 **Request:**
+
 ```json
 {
-  "email": "owner@acme.com",
+  "email": "owner@turbovets.com",
   "password": "password123"
 }
 ```
 
 **Response:**
+
 ```json
 {
   "access_token": "eyJhbGc...",
   "user": {
     "id": "uuid",
-    "email": "owner@acme.com",
+    "email": "owner@turbovets.com",
     "role": "OWNER",
     "organizationId": "uuid"
   }
@@ -374,9 +387,11 @@ Authenticate user and receive JWT token
 ```
 
 #### POST /auth/register
+
 Register new user
 
 **Request:**
+
 ```json
 {
   "email": "newuser@example.com",
@@ -393,9 +408,11 @@ Register new user
 All task endpoints require `Authorization: Bearer <token>` header
 
 #### POST /tasks
+
 Create a new task
 
 **Request:**
+
 ```json
 {
   "title": "Implement feature X",
@@ -406,6 +423,7 @@ Create a new task
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -421,9 +439,11 @@ Create a new task
 ```
 
 #### GET /tasks
+
 Retrieve all accessible tasks (scoped by role and org)
 
 **Response:**
+
 ```json
 [
   {
@@ -441,9 +461,11 @@ Retrieve all accessible tasks (scoped by role and org)
 ```
 
 #### PUT /tasks/:id
+
 Update a task (Admin and Owner only)
 
 **Request:**
+
 ```json
 {
   "title": "Updated title",
@@ -454,9 +476,11 @@ Update a task (Admin and Owner only)
 **Response:** Updated task object
 
 #### DELETE /tasks/:id
+
 Delete a task (Admin and Owner only)
 
 **Response:**
+
 ```json
 {
   "message": "Task deleted successfully"
@@ -466,6 +490,7 @@ Delete a task (Admin and Owner only)
 ### Error Responses
 
 **401 Unauthorized:**
+
 ```json
 {
   "statusCode": 401,
@@ -474,6 +499,7 @@ Delete a task (Admin and Owner only)
 ```
 
 **403 Forbidden:**
+
 ```json
 {
   "statusCode": 403,
@@ -482,6 +508,7 @@ Delete a task (Admin and Owner only)
 ```
 
 **404 Not Found:**
+
 ```json
 {
   "statusCode": 404,
@@ -499,7 +526,7 @@ Delete a task (Admin and Owner only)
 # Backend unit tests
 npx nx test api
 
-# Frontend unit tests  
+# Frontend unit tests
 npx nx test dashboard
 
 # All tests
@@ -513,12 +540,14 @@ npx nx test dashboard --coverage
 ### Test Coverage
 
 **Backend:**
+
 - ✅ Authentication service (login, register, validation)
 - ✅ RBAC logic (role-based access checks)
 - ✅ Task service (CRUD operations, permissions)
 - ✅ Organization hierarchy access
 
 **Frontend:**
+
 - ✅ Authentication service
 - ✅ Task service
 - ✅ HTTP interceptor
@@ -527,11 +556,13 @@ npx nx test dashboard --coverage
 ### Key Test Scenarios
 
 1. **Authentication**
+
    - Valid login returns JWT
    - Invalid credentials rejected
    - Registration creates user
 
 2. **RBAC**
+
    - Owner accesses tasks in org hierarchy
    - Admin limited to same org
    - Viewer sees only own tasks
@@ -551,21 +582,26 @@ npx nx test dashboard --coverage
 The following are ideas on what to do for security when this project is actually used in production.
 
 1. **Using Third-party Authentication Service**
+
    - Maintaining an authentication service can be tricky with improper password hashing, proper key rotations, potential liability, etc
    - Would recommend something like Auth0 or Amazon Cognito (if already using AWS). User information can be handled in those services too
 
 2. **Third-party Secret Storage**
+
    - If storing JWT secrets, storing in plaintext in an env file is not great
    - Use AWS Secrets Manager, Hashicorp Vault, 1Password, etc.
 
 3. **HttpOnly Cookies**
+
    - Set HTTPOnly cookie containing access token on login if using custom JWT authenticator
 
 4. **Rate Limiting**
+
    - Per-endpoint rate limits
    - Distributed rate limiting with Redis
 
 5. **HTTPS**
+
    - SSL/TLS encryption to protect any sensitive data as best as possible
    - Important if handling passwords
 
@@ -578,25 +614,30 @@ The following are ideas on what to do for security when this project is actually
 The following would be features that I would want to implement if given the chance.
 
 1. **Audit Logging**
+
    - Complete CRUD operation logging
    - User action history
    - Compliance reports
    - Could be provided by third party service
 
 2. **Task Features**
+
    - Task assignment to users
+   - Task assignment to specific organizations
    - File attachments
    - Comments and collaboration
    - Due dates and reminders
    - Email notifications
 
 3. **Performance**
+
    - Database indexing
    - Query optimization
    - Pagination
    - Caching layer
 
 4. **Database migration**
+
    - Instead of using SQLite where WRITEs can get very costly, use Postgres instead
    - Besides a few QoL features, Postgres can be horizontally scaled if needed unlike SQLite
 
