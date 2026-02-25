@@ -2,6 +2,7 @@ import { Role } from '@blow-72DAA736-CA9D-4317-A0B1-0F3A7034A4EE/data';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
 
 export interface JwtPayload {
   sub: string; // user id
@@ -19,13 +20,13 @@ export interface AuthenticatedUser {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       // NOTE: Only for test purposes, not for actual production use
       // Real case, the server should not run if a proper secret is not set
-      secretOrKey: process.env.JWT_SECRET || 'your-secret-key',
+      secretOrKey: configService.get<string>('JWT_SECRET') || 'secret-key',
     });
   }
 

@@ -548,58 +548,65 @@ npx nx test dashboard --coverage
 
 ### Production-Ready Security
 
-1. **Using Third-party authentication service**
+The following are ideas on what to do for security when this project is actually used in production.
+
+1. **Using Third-party Authentication Service**
    - Maintaining an authentication service can be tricky with improper password hashing, proper key rotations, potential liability, etc
    - Would recommend something like Auth0 or Amazon Cognito (if already using AWS). User information can be handled in those services too
 
-2. **CSRF Protection**
-   - CSRF tokens for state-changing operations
-   - SameSite cookie attributes
+2. **Third-party Secret Storage**
+   - If storing JWT secrets, storing in plaintext in an env file is not great
+   - Use AWS Secrets Manager, Hashicorp Vault, 1Password, etc.
 
-3. **Rate Limiting**
+3. **HttpOnly Cookies**
+   - Set HTTPOnly cookie containing access token on login if using custom JWT authenticator
+
+4. **Rate Limiting**
    - Per-endpoint rate limits
    - Distributed rate limiting with Redis
 
-4. **RBAC Caching**
-   - Cache permission checks in Redis
-   - Invalidate on role/org changes
+5. **HTTPS**
+   - SSL/TLS encryption to protect any sensitive data as best as possible
+   - Important if handling passwords
+
+6. **RSA Encryption instead of HMAC**
+   - Allows us to migrate to a third-party authentication service if we need to, as they all use RSA
+   - No one point of failure with just one key for signing and verifying with HMAC
 
 ### Advanced Features
 
-1. **Role Delegation**
-   - Temporary admin privileges
-   - Time-bound permissions
+The following would be features that I would want to implement if given the chance.
 
-2. **Audit Logging**
+1. **Audit Logging**
    - Complete CRUD operation logging
    - User action history
    - Compliance reports
+   - Could be provided by third party service
 
-3. **Task Features**
+2. **Task Features**
    - Task assignment to users
    - File attachments
    - Comments and collaboration
    - Due dates and reminders
    - Email notifications
 
-4. **Performance**
+3. **Performance**
    - Database indexing
    - Query optimization
    - Pagination
    - Caching layer
 
-5. **Database migration**
+4. **Database migration**
    - Instead of using SQLite where WRITEs can get very costly, use Postgres instead
    - Besides a few QoL features, Postgres can be horizontally scaled if needed unlike SQLite
 
-6. **Deployment**
+5. **Deployment**
    - Docker containerization
    - PostgreSQL for production
    - CI/CD pipeline
    - Monitoring and logging
 
 ---
-
 
 ## Known Issues
 

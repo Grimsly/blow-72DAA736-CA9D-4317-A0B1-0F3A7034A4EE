@@ -28,18 +28,20 @@ export class TasksService {
     const task = await this.tasksRepository.findOne({ where: { id: taskId } });
     if (!task) throw new NotFoundException('Task not found');
 
-    // Owner can access all tasks in their org hierarchy
-    if (userRole === Role.OWNER) {
-      return await this.isInOrgHierarchy(task.organizationId, userOrgId);
+    switch (userRole) {
+      // Owner can access all tasks in their org hierarchy
+      case Role.OWNER:
+        return await this.isInOrgHierarchy(task.organizationId, userOrgId);
+      // Admin can access tasks in same org
+      case Role.ADMIN:
+        return task.organizationId === userOrgId;
+      // Viewer can only see tasks they created
+      case Role.VIEWER:
+        return task.createdById === userId;
+      // Reject all roles that are unknown
+      default:
+        return false;
     }
-
-    // Admin can access tasks in same org
-    if (userRole === Role.ADMIN) {
-      return task.organizationId === userOrgId;
-    }
-
-    // Viewer can only see tasks they created
-    return task.createdById === userId;
   }
 
   async isInOrgHierarchy(
@@ -74,26 +76,29 @@ export class TasksService {
     userRole: Role,
     userOrgId: string
   ): Promise<Task[]> {
-    if (userRole === Role.OWNER) {
-      const orgIds = await this.getOrgHierarchyIds(userOrgId);
-      return this.tasksRepository.find({
-        where: { organizationId: In(orgIds) },
-        order: { createdAt: 'DESC' },
-      });
+    switch (userRole) {
+      case Role.OWNER: {
+        const orgIds = await this.getOrgHierarchyIds(userOrgId);
+        return this.tasksRepository.find({
+          where: { organizationId: In(orgIds) },
+          order: { createdAt: 'DESC' },
+        });
+      }
+      case Role.ADMIN:
+        return this.tasksRepository.find({
+          where: { organizationId: userOrgId },
+          order: { createdAt: 'DESC' },
+        });
+      // Only return tasks created by the user
+      case Role.VIEWER:
+        return this.tasksRepository.find({
+          where: { createdById: userId },
+          order: { createdAt: 'DESC' },
+        });
+      // In the case for some reason the role is unknown, return nothing
+      default:
+        return [];
     }
-
-    if (userRole === Role.ADMIN) {
-      return this.tasksRepository.find({
-        where: { organizationId: userOrgId },
-        order: { createdAt: 'DESC' },
-      });
-    }
-
-    // Viewer only sees their own
-    return this.tasksRepository.find({
-      where: { createdById: userId },
-      order: { createdAt: 'DESC' },
-    });
   }
 
   async getOrgHierarchyIds(orgId: string): Promise<string[]> {
