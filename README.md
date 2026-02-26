@@ -647,6 +647,10 @@ The following would be features that I would want to implement if given the chan
    - CI/CD pipeline
    - Monitoring and logging
 
+6. **Documentation**
+   - More comments on code
+   - My style usually involves a lot of comments for other developers, but for the sake of time, I had to compromise
+
 ---
 
 ## Known Issues
